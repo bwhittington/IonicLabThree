@@ -8,8 +8,11 @@
 <ion-content class="instructors" padding>
     <h2 class="center">Grad Academy Instructors</h2>
     <ion-card>
-    <ion-card-header>
-        {{instructorModel.name}}
-    </ion-card-header>
-</ion-card>
+        <ion-card-header>
+            {{instructorModel.name}}
+        </ion-card-header>
+    </ion-card>
+    <ion-content>
+        <div #map id="map" style="height:75%;"></div>
+    </ion-content>
 </ion-content>

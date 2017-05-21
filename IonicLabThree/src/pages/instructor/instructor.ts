@@ -1,5 +1,6 @@
 ﻿import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams } from 'ionic-angular';
+import { GoogleMaps, GoogleMap, GoogleMapsEvent, LatLng, CameraPosition, MarkerOptions, Marker } from '@ionic-native/google-maps';
 
 import { InstructorService } from '../../components/instructors/shared/instructor.service';
 import { InstructorModel } from '../../components/instructors/shared/instructor.model';
@@ -12,15 +13,17 @@ import { InstructorModel } from '../../components/instructors/shared/instructor.
 
 export class InstructorPage {
 
-    public instructorModel: InstructorModel;
-    public instructorService: InstructorService;
-    public navCtrl: NavController;
-    public navParams: NavParams;
-    public id: number;
+    private instructorModel: InstructorModel;
+    private instructorService: InstructorService;
+    private navCtrl: NavController;
+    private navParams: NavParams;
+    private id: number;
+    private googleMaps: GoogleMaps;
 
-    constructor(navCtrl: NavController, navParams: NavParams, instructorService: InstructorService) {
+    constructor(navCtrl: NavController, navParams: NavParams, instructorService: InstructorService, googleMaps: GoogleMaps) {
         this.instructorService = instructorService;
         this.navParams = navParams;
+        this.googleMaps = googleMaps;
 
         this.id = this.navParams.get('id');
         this.instructorModel = this.instructorService.getInstructor(this.id);
@@ -28,5 +31,38 @@ export class InstructorPage {
 
     public ionViewDidLoad(): void {
         console.log('ionViewDidLoad Instructor');
+        this.loadMap(this.instructorModel);
     }
+
+    public loadMap(instructorModel: InstructorModel): void {
+
+        let element: HTMLElement = document.getElementById('map');
+        let map: GoogleMap = this.googleMaps.create(element);
+        map.clear();
+
+        let pos: LatLng = new LatLng(instructorModel.latitude, instructorModel.longitude);
+
+        let position: CameraPosition = {
+            target: pos,
+            zoom: 5,
+        };
+
+        
+
+        //create marker
+        let markerOptions: MarkerOptions = {
+            position: pos,
+            title: instructorModel.name
+        };
+
+        // map ready event
+        map.one(GoogleMapsEvent.MAP_READY)
+            //add a marker
+            .then(() => map.addMarker(markerOptions)
+                .then(() => map.moveCamera(position)),
+            //show some info
+            (marker) => marker.showInfoWindow());
+
+    }
+
 }
